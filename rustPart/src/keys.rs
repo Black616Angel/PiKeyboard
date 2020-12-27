@@ -1,3 +1,9 @@
+
+use std::fs::OpenOptions;
+use std::io::prelude::*;
+
+
+
 pub const LEFT_CTRL: u8 = 0x01;
 pub const RIGHT_CTRL: u8 = 0x10;
 pub const LEFT_SHIFT: u8 = 0x02;
@@ -44,6 +50,7 @@ pub const SEVEN: u8 = 0x24;
 pub const EIGHT: u8 = 0x25;
 pub const NINE: u8 = 0x26;
 pub const ZERO: u8 = 0x27;
+
 pub const RETURN: u8 = 0x28;
 pub const ESC: u8 = 0x29;
 pub const BACKSPACE: u8 = 0x2a;
@@ -139,26 +146,15 @@ pub const VOLUME_DOWN: u8 = 0x81;
 pub const ENDINPUT: [u8; 8] = [NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL];
 
 #[derive(Debug)]
-pub struct Key { }
+pub struct Key {
+	file: std::fs::File,
+}
+
 impl Key {
-	pub fn simple(key: u8) -> Vec<u8> {
-		vec![NULL, NULL, key, NULL, NULL, NULL, NULL, NULL ]
-	}
-	pub fn simplem(key: u8, modi: u8) -> Vec<u8> {
+	fn simplem(key: u8, modi: u8) -> Vec<u8> {
 		vec![modi, NULL, key, NULL, NULL, NULL, NULL, NULL ]
 	}
-	pub fn multi(keys: Vec<u8>) -> Vec<u8> {
-		let mut ret: Vec<u8> = vec![NULL, NULL];
-		for i in 0..3 {
-			if i <= keys.len()-1 {
-				ret.push(keys[i]);
-			} else {
-				ret.push(NULL);
-			}
-		}
-		ret
-	}
-	pub fn multim(keys: Vec<u8>, modi: u8) -> Vec<u8> {
+	fn multim(keys: Vec<u8>, modi: u8) -> Vec<u8> {
 		let mut ret: Vec<u8> = vec![modi, NULL];
 		for i in 0..3 {
 			if i <= keys.len()-1 {
@@ -168,5 +164,77 @@ impl Key {
 			}
 		}
 		ret
+	}
+
+	fn get_key(key: String) -> Result<u8,std::io::Error> {
+		let mut ret: u8 = NULL;
+		if key.len() == 1 {
+			let chars: Vec<char> = key.chars().collect();
+			let keyb = chars[0] as u8;
+			ret = match keyb {
+				32		=> SPACE,
+				// 33		=> ??
+				58      => ZERO,
+				49..=57 => keyb-19,
+				65..=90 => keyb-61, //capital letters
+				97..=122 => keyb-93, //small letters
+				_ => NULL,
+			};
+		}
+		Ok(ret)
+	}
+
+	fn get_modi(key: String) -> Result<u8,std::io::Error> {
+		let mut ret: u8 = NULL;
+		if key.len() == 1 {
+			let chars: Vec<char> = key.chars().collect();
+			let keyb = chars[0] as u8;
+			ret = match keyb {
+				65..=90 => RIGHT_SHIFT, //capital letters
+				_ => NULL,
+			};
+		}
+		Ok(ret)
+	}
+
+	pub fn new(device: String) -> Key {
+		Key{ file: OpenOptions::new().write(true).open(device).unwrap() }
+	}
+	fn flush(&mut self) -> Result<(),std::io::Error> {
+		self.file.flush()?;
+		self.file.write(&ENDINPUT)?;
+		self.file.flush()?;
+		Ok(())
+	}
+	fn write_simplem(&mut self, key: u8, modi: u8) -> Result<(),std::io::Error> {
+		self.file.write(&Key::simplem(key, modi)[..])?;
+		self.flush()?;
+		Ok(())
+	}
+	fn write_multim(&mut self, keys: Vec<u8>, modi: u8) -> Result<(),std::io::Error> {
+		self.file.write(&Key::multim(keys, modi)[..])?;
+		self.flush()?;
+		Ok(())
+	}
+	pub fn write(&mut self, all_keys: &str) -> Result<(),std::io::Error> {
+		for keys in all_keys.split(" ") {
+			if !keys.contains("\\") && !keys.contains("+") {
+				self.write_simplem(Key::get_key(keys.to_string())?, Key::get_modi(keys.to_string())?)?;
+			} else if !keys.contains("\\") {
+				let mut keyvec: Vec<u8> = Vec::new();
+				let mut modivec: Vec<u8> = Vec::new();
+				let mut modi: u8 = NULL;
+				for s in keys.split("+") {
+					keyvec.push(Key::get_key(s.to_string())?);
+					modivec.push(Key::get_modi(s.to_string())?);
+				}
+				for m in modivec {
+					modi = m;
+				}
+
+				self.write_multim(keyvec,modi)?;
+			}
+		}
+		Ok(())
 	}
 }

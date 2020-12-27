@@ -1,14 +1,9 @@
-use std::fs::OpenOptions;
-use std::io::prelude::*;
+pub mod keys;
+use crate::keys::*;
 
-pub mod constants;
-use crate::constants::*;
-
-fn main() {
-	let hid_path = "/dev/hidg0";
-	let mut file = OpenOptions::new().write(true).open(hid_path).unwrap();
-	file.write(&Key::simple(A)[..]).expect("write failed");
-	file.flush().unwrap();
-	file.write(&ENDINPUT).expect("write failed");
-	file.flush().unwrap();
+fn main() -> Result<(),std::io::Error> {
+	let hid_path = "/dev/hidg0".to_string();
+	let mut lc_key = Key::new(hid_path);
+	lc_key.write("A")?;
+	Ok(())
 }
