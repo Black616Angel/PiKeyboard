@@ -196,9 +196,20 @@ impl Key {
 		}
 		Ok(ret)
 	}
+	pub fn std_write(keys: String) {
+		let k = Key::new( "/dev/hidg0".to_string());
+		if k.is_err() {
+			println!("{:?}", keys);
+		} else {
+			let res = k.unwrap().write(&keys);
+			if res.is_err() {
+				println!("{:?}", keys);
+			}
+		}
+	}
 
-	pub fn new(device: String) -> Key {
-		Key{ file: OpenOptions::new().write(true).open(device).unwrap() }
+	pub fn new(device: String) -> Result<Key, std::io::Error> {
+		Ok(Key{ file: OpenOptions::new().write(true).open(device)? })
 	}
 	fn flush(&mut self) -> Result<(),std::io::Error> {
 		self.file.flush()?;
