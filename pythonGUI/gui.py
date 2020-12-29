@@ -43,7 +43,7 @@ cframe.pack(anchor="e") #east
 path = ""
 if len(sys.argv) >= 1:
 	path = str(sys.argv[1])
-else
+else:
 	path = "../keyboards/"
 
 kb_folder = Path(path).rglob('*.json')
