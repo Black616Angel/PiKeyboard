@@ -1,12 +1,6 @@
 pub mod keys;
-pub mod gui;
-pub mod keyboard;
-
-use iced::Settings;
-use iced::Sandbox;
-
-use crate::gui::*;
+use crate::keys::*;
 
 fn main() {
-	PiKeyboardGUI::run(Settings::default()).unwrap();
+	Key::std_write(std::env::args().nth(1).expect("no string given"));
 }

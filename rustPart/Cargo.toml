@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 #GUI
-iced = "*"
+iced = { version = "*" }
 
 #JSON
 serde = { version = "1.0", features = ["derive"] }
