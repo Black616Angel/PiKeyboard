@@ -1,9 +1,0 @@
-{
-	"name" : "TestKB",
-	"keys" : [
-		{ "name" : "Test1", "keys" : "A B C a b c", "positionx" : 1, "positiony" : 1},
-		{ "name" : "Test2", "keys" : "a b c A B C", "positionx" : 1, "positiony" : 2},
-		{ "name" : "Test3", "keys" : "5 6 7 8 9 0", "positionx" : 2, "positiony" : 1},
-		{ "name" : "Test4", "keys" : "1 2 3 4 5 6", "positionx" : 2, "positiony" : 2}
-	]
-}

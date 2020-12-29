@@ -5,7 +5,8 @@
 Just clone the whole repository and then start the install.bash and reboot afterwards
 ```bash
 git clone https://github.com/Black616Angel/PiKeyboard.git
-sudo ./install.bash
+chmod +x install.sh
+sudo ./install.sh
 sudo reboot
 ```
 

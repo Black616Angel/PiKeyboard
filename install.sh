@@ -21,3 +21,7 @@ cp usb-gadget.service /lib/systemd/system/usb-gadget.service
 
 systemctl daemon-reload
 systemctl enable usb-gadget.service
+
+chmod +x run.sh
+chmod +x pikeyboard
+chmod +x ./pythonGUI/gui.py
