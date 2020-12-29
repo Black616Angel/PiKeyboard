@@ -4,29 +4,43 @@ import json
 from pathlib import Path
 import subprocess
 
-def add_menu_button(jsonKB, mframe):
-	Button(mframe, text=jsonKB["name"], command=build_container(jsonKB)).pack()
+class Btn:
+	name = ""
+	keys = ""
+	def __init__(self, jsonBtn, cframe):
+		print(jsonBtn["name"])
+		self.name= jsonBtn["name"]
+		self.keys= jsonBtn["keys"]
+		tk.Button(cframe, text=self.name, command=self.write_string).grid(column=jsonBtn["positionx"], row=jsonBtn["positiony"])
+	
+	def write_string(self):
+		print(self.keys)
+		ret = subprocess.run([".././pikeyboard", self.keys])
+		return ret
+class Keyboard:
+	jsonKB = ""
+	def __init__(self, jsonKB, mframe):
+		print(jsonKB["name"])
+		self.jsonKB = jsonKB
+		tk.Button(mframe, text=jsonKB["name"], command=self.fill_container).pack()
 
-def build_button(jsonBut, cframe):
-	Button(cframe, text=jsonBut["name"], command=write_string(jsonBut["keys"])).pack()
-
-def write_string(str):
-	ret = subprocess.run(["./pikeyboard", str])
-	return ret
-
-def fill_container(jsonKB):
-	for but in jsonKB[""]:
-		build_button(but)
+	def fill_container(self):
+		for widget in cframe.winfo_children():
+			widget.destroy()
+		cframe
+		for but in self.jsonKB["keys"]:
+			Btn(but, cframe)
 
 root = tk.Tk()
 all_kb = []
 mframe = tk.Frame(root)
+mframe.pack()
 cframe = tk.Frame(root)
+cframe.pack()
 
-kb_folder = Path('./keyboards/').rglob('*.json')
+kb_folder = Path('../keyboards/').rglob('*.json')
 for file in kb_folder:
 	jsonKB = json.loads(open(file, "r").read())
-	all_kb.append(jsonKB)
-	add_menu_button(jsonKB, mframe)
+	all_kb.append(Keyboard(jsonKB, mframe))
 
 root.mainloop()

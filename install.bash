@@ -14,10 +14,10 @@ fi
 
 ENABLE_RPI_HID_PATH=/opt/enable-rpi-hid
 mkdir -p "$(dirname $ENABLE_RPI_HID_PATH)"
-mv enable-rpi-hid "$ENABLE_RPI_HID_PATH"
+cp enable-rpi-hid "$ENABLE_RPI_HID_PATH"
 chmod +x "$ENABLE_RPI_HID_PATH"
 
-mv usb-gadget.service /lib/systemd/system/usb-gadget.service
+cp usb-gadget.service /lib/systemd/system/usb-gadget.service
 
 systemctl daemon-reload
 systemctl enable usb-gadget.service
