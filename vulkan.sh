@@ -39,11 +39,11 @@ git clone https://gitlab.freedesktop.org/mesa/mesa.git mesa_vulkan
 # now build v3dv
 cd mesa_vulkan
 
-arm32=$( grep armv7l <<<$(uname -a) )
-arch64=$( grep aarch64 <<<$(uname -a) )
-if [[ "$arm32" != "" ]]; then
+A32=$( grep armv7l <<<$(uname -a) )
+A64=$( grep aarch64 <<<$(uname -a) )
+if [[ "$A32" != "" ]]; then
 	CFLAGS="-mcpu=cortex-a72 -mfpu=neon-fp-armv8" CXXFLAGS="-mcpu=cortex-a72 -mfpu=neon-fp-armv8" \ meson --prefix /usr \ -D platforms=x11 \ -D vulkan-drivers=broadcom \ -D dri-drivers= \ -D gallium-drivers=kmsro,v3d,vc4 \ -D buildtype=release build
-elif [[ "$arch64" != "" ]]; then
+elif [[ "$A64" != "" ]]; then
 	CFLAGS="-mcpu=cortex-a72" CXXFLAGS="-mcpu=cortex-a72" \ meson --prefix /usr \ -D platforms=x11 \ -D vulkan-drivers=broadcom \ -D dri-drivers= \-D gallium-drivers=kmsro,v3d,vc4 \-D buildtype=release build
 else
 	return 1
